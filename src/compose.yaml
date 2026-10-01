@@ -11,7 +11,7 @@ services:
       - DB_PASS=${DB_PASS?Password is not set}
       - DB_HOST=${DB_HOST?Database host is not set}
       - DB_PORT=${DB_PORT?Database port is not set}
-      
+
     ports:
       - "${BACKEND_PORT}:80"
 
@@ -20,7 +20,7 @@ services:
     volumes:
       - ./frontend:/var/www/html
     ports:
-      - "80:80"
+      - "${FRONTEND_PORT}:80"
 
   db:
     image: mariadb:lts
