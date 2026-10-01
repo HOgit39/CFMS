@@ -1,0 +1,30 @@
+services:
+  web:
+    image: php:8.3-apache
+    volume:
+      - ./backend:/var/www/html
+      - .env:/var/www/.env
+    ports:
+      - "80:80"
+
+  db:
+    image: mariadb:lts
+
+    environment:
+      - MARIADB_DATABASE=${DB_NAME?Database name is not set}
+      - MARIADB_USER=${DB_USER?User name is not set}
+      - MARIADB_PASSWORD=${DB_PASSWORD?Password is not set}
+      - MARIADB_ROOT_PASSWORD=${DB_ROOT_PASSWORD?Root password is not set}
+      
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      start_period: 30s
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+    volumes:
+      - db_data:/var/lib/mysql
+
+volumes:
+  db_data:
