@@ -8,7 +8,6 @@ user_name
 is_active
 is_finished(アカウントの終了時刻)
 created_at
-role_id FK
 
 →QRcodeはuser_idのデータを持つので、QRcode列はいらないかも？
 
