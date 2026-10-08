@@ -14,8 +14,8 @@ created_at
 
 Staff(管理者とスタッフ)
 ------------------
-staff_id PK
-staff_name
+id PK
+name
 password(ハッシュ化する)
 role(列挙型で作成)
 
