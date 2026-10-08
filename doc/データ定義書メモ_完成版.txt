@@ -6,6 +6,7 @@ Users(利用者)
 user_id PK
 user_name
 is_active
+is_finished(アカウントの終了時刻)
 created_at
 role_id FK
 
@@ -14,46 +15,27 @@ role_id FK
 
 Staff(管理者とスタッフ)
 ------------------
-staff_id PK
-staff_name
+Staff_id PK
+Staff_name
 login_id
 password(ハッシュ化する)
-role_id FK
-
-
-Role(権限管理）
------------------
-role_id PK
-(利用者、スタッフ、管理者を見分けるための権限)
-role_name
-(role_idに対応した名前(利用者、スタッフ、管理者のこと))
+role(列挙型で作成)
 
 
 Store(店)
 ------------------
-store_id FK
+store_id PK
 store_name
 
 
-1対多もしくは1対1の場合を想定し、StoreテーブルからEventテーブルを作成。
-
-Events（一つの店に複数のゲームがある場合、それらを区別するためのテーブル）
-------------
-event_id
-store_id FK
-event_name
-
-
-PointHistory
+Scores
 ------------------
-history_id PK（履歴の主キー）
+score_id PK（履歴の主キー）
 user_id FK（ポイントの持ち主）
 staff_id FK
 (そのポイントを記録した担当者の名前、ユーザーの不正監視を目的とする)
-point
+score
 store_id FK
 (どの店のポイントかを記録）
-event_id FK
-(店に複数あるかもしれないゲームのポイントをそれぞれ記録するためのデータ）
 created_at
 (時間を記録することで日ごとの集計が可能になる）
