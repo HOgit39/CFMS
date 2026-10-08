@@ -6,7 +6,7 @@ Users(利用者)
 user_id PK
 user_name
 is_active
-is_finished(アカウントの終了時刻)
+finished_at(アカウントの終了時刻)
 created_at
 
 →QRcodeはuser_idのデータを持つので、QRcode列はいらないかも？
@@ -38,3 +38,4 @@ store_id FK
 (どの店のポイントかを記録）
 created_at
 (時間を記録することで日ごとの集計が可能になる）
+
