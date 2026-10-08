@@ -16,7 +16,6 @@ Staff(管理者とスタッフ)
 ------------------
 staff_id PK
 staff_name
-login_id
 password(ハッシュ化する)
 role(列挙型で作成)
 
