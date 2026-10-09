@@ -18,7 +18,7 @@ password(ハッシュ化する)
 role(列挙型で作成)
 
 
-Store(店)
+Stores(店)
 ------------------
 id PK
 name
@@ -28,10 +28,10 @@ Scores
 ------------------
 id PK（履歴の主キー）
 Users_id FK（ポイントの持ち主）
-Staff_id FK
+Staff_id FK (Staffは複数形無し)
 (そのポイントを記録した担当者のID。ユーザーの不正監視を目的とする)
 score
-Store_id FK
+Stores_id FK
 (どの店のポイントかを記録）
 created_at
 (時間を記録することで日ごとの集計が可能になる）
