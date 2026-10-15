@@ -8,7 +8,7 @@ name
 is_active
 finished_at(アカウントの終了時刻)
 created_at
-heartbeat_at (最終Heartbeatsの記録）
+heartbeat_at (最終Heartbeatの記録）
 
 
 Staff(管理者とスタッフ)(Staffは複数形無し)
