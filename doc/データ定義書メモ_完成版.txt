@@ -8,6 +8,7 @@ name
 is_active
 finished_at(アカウントの終了時刻)
 created_at
+heartbeat_at (最終Heartbeatsの記録）
 
 
 Staff(管理者とスタッフ)(Staffは複数形無し)
@@ -24,7 +25,7 @@ id PK
 name
 
 
-Scores
+Scores(ポイント)
 ------------------
 id PK（履歴の主キー）
 user_id FK（ポイントの持ち主）
@@ -35,5 +36,3 @@ store_id FK
 (どの店のポイントかを記録）
 created_at
 (時間を記録することで日ごとの集計が可能になる）
-
-
