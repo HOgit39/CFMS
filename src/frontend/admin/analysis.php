@@ -61,6 +61,9 @@
                  role="status"
                  aria-live="polite"></div>
 
+            <!-- CommentAnchor: CSRFトークンの埋め込み先 -->
+            <input type="hidden" class="csrf_token" name="csrf_token" value="">
+
             <!-- CommentAnchor: ユーザー集計 -->
             <section class="mb-4" aria-labelledby="userStatisticsTitle">
                 <h2 id="userStatisticsTitle" class="h4 fw-bold mb-3">
@@ -204,6 +207,7 @@
                                 <select id="exportType" name="type" class="form-select" required>
                                     <option value="user_history">ユーザー履歴</option>
                                     <option value="store_statistics">店舗別集計</option>
+                                    <option value="redemption_history">景品交換履歴</option>
                                 </select>
                             </div>
 
@@ -345,14 +349,31 @@
             });
         }
 
+        // CommentAnchor: CSRFトークンを取得（埋め込み前でもfetchTokenで取得して待つ）
+        async function getCsrfToken() {
+            const input = document.querySelector('.csrf_token');
+
+            if (input && input.value) {
+                return input.value;
+            }
+
+            return await fetchToken('<?= getenv('API_URL') ?>');
+        }
+
         // CommentAnchor: JSON形式のAPIレスポンスを取得
         async function fetchJson(url) {
+            const csrfToken = await getCsrfToken();
+
             const response = await fetch(url, {
-                method: 'GET',
+                method: 'POST',
                 credentials: 'include',
                 headers: {
+                    'Content-Type': 'application/json',
                     'Accept': 'application/json'
-                }
+                },
+                body: JSON.stringify({
+                    csrf_token: csrfToken
+                })
             });
 
             const responseText = await response.text();
@@ -486,14 +507,19 @@
 
                 try {
                     const exportType = document.getElementById('exportType').value;
-                    const url = `${EXPORT_API_URL}?type=${encodeURIComponent(exportType)}`;
+                    const csrfToken = await getCsrfToken();
 
-                    const response = await fetch(url, {
-                        method: 'GET',
+                    const response = await fetch(EXPORT_API_URL, {
+                        method: 'POST',
                         credentials: 'include',
                         headers: {
+                            'Content-Type': 'application/json',
                             'Accept': 'text/csv'
-                        }
+                        },
+                        body: JSON.stringify({
+                            type: exportType,
+                            csrf_token: csrfToken
+                        })
                     });
 
                     if (!response.ok) {
@@ -546,7 +572,7 @@
         }
 
         // CommentAnchor: ページ読み込み時に集計データを取得
-        loadStatistics();
+        document.addEventListener('DOMContentLoaded', loadStatistics);
     </script>
 
     <!-- CommentAnchor: 共通フッター -->
