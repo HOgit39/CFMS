@@ -350,14 +350,26 @@
         }
 
         // CommentAnchor: CSRFトークンを取得（埋め込み前でもfetchTokenで取得して待つ）
-        async function getCsrfToken() {
+                let csrfTokenPromise = null;
+
+        // CommentAnchor: CSRFトークンを取得（重複リクエストを防止）
+        function getCsrfToken() {
             const input = document.querySelector('.csrf_token');
 
             if (input && input.value) {
-                return input.value;
+                return Promise.resolve(input.value);
             }
 
-            return await fetchToken('<?= getenv('API_URL') ?>');
+            if (!csrfTokenPromise) {
+                csrfTokenPromise = fetchToken('<?= getenv('API_URL') ?>').then(token => {
+                    if (input) {
+                        input.value = token;
+                    }
+                    return token;
+                });
+            }
+
+            return csrfTokenPromise;
         }
 
         // CommentAnchor: JSON形式のAPIレスポンスを取得

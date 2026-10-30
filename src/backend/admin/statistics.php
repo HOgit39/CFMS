@@ -48,6 +48,7 @@ $rawData = file_get_contents('php://input');
 $data = json_decode($rawData, true);
 
 if ($data === null) {
+    http_response_code(400);
     echo json_encode([
         "success" => false,
         "message" => "JSONのデコードに失敗しました。",
@@ -164,6 +165,7 @@ try {
         "storeUserRanking" => $storeUserRanking
     ]);
 } catch (\Exception $e) {
+    error_log("Statistics error: " . $e->getMessage());
     http_response_code(500);
     echo json_encode([
         "success" => false,
