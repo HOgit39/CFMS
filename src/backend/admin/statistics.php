@@ -121,17 +121,17 @@ try {
     );
     $userCounts = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    //ANCHOR - 今日を含む利用者ランキング（同姓同名もuser_idで区別する）
+    //ANCHOR - 今日を含む利用者得点ランキング
     $stmt = $db->exec(
-        "SELECT u.id AS user_id, COUNT(sc.id) AS use_count
+        "SELECT u.token AS user_id, SUM(sc.score) AS use_count
          FROM scores sc
          INNER JOIN users u ON u.id = sc.user_id
-         GROUP BY u.id
-         ORDER BY use_count DESC, u.id ASC"
+         GROUP BY u.token
+         ORDER BY use_count DESC, u.token ASC"
     );
     $recentUserRanking = array_map(function ($row) {
         return [
-            "userId" => (int)$row['user_id'],
+            "userId" => $row['user_id'],
             "useCount" => (int)$row['use_count']
         ];
     }, $stmt->fetchAll(PDO::FETCH_ASSOC));

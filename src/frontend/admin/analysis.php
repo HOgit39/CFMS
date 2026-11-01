@@ -131,7 +131,7 @@
                 <section class="mb-5">
 
                     <h2 class="h5 mb-3">
-                        利用者ランキング
+                        利用者得点ランキング
                     </h2>
 
                     <div class="table-responsive">
@@ -141,8 +141,8 @@
                             <thead class="table-light">
                                 <tr>
                                     <th>順位</th>
-                                    <th>ユーザーID</th>
-                                    <th>利用回数</th>
+                                    <th>ユーザートークン</th>
+                                    <th>得点</th>
                                 </tr>
                             </thead>
 
