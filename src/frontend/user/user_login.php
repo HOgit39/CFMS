@@ -299,7 +299,7 @@
                             "success"
                         );
                         window.location.href =
-                            "/user/user_mainpage.php";
+                            "/user/user_main.php";
                     } else {
 
                         showMessage(
