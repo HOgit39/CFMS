@@ -720,7 +720,7 @@
                 }).then(data => {
                     if (data.success) {
                         alert('ログアウトしました。');
-                        location.href = '/user/user_mainpage.php';
+                        location.href = '/user/user_main.php';
                     } else {
                         throw new Error(data.message || 'ログアウトに失敗しました。');
                     }
