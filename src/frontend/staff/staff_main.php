@@ -100,24 +100,6 @@
                             </div>
                         </div>
                     </div>
-                    <!-- ユーザー作成・得点付与 -->
-                    <div class="col-12 col-md-6 col-xl-4" data-menu-page="admin">
-                        <div class="card h-100 border-0 shadow-sm">
-                            <div class="card-body p-4 d-flex flex-column">
-                                <div class="mb-3">
-                                    <span class="badge text-bg-warning">USER</span>
-                                </div>
-                                <h3 class="h5 fw-bold">ユーザー作成・得点付与</h3>
-                                <p class="text-secondary flex-grow-1">
-                                    新しい利用者を登録し、必要に応じて初期得点を記録します。
-                                </p>
-                                <a href="/admin/bulkscore_registration.php"
-                                    class="btn btn-outline-warning w-100">
-                                    ユーザー作成を開く
-                                </a>
-                            </div>
-                        </div>
-                    </div>
                     <!-- 得点付与 -->
                     <div class="col-12 col-md-6 col-xl-4" data-menu-page="store">
                         <div class="card h-100 border-0 shadow-sm">
