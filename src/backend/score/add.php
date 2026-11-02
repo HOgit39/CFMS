@@ -250,11 +250,9 @@ try {
     $stmt = $db->exec(
         "SELECT COUNT(*) AS cnt
          FROM scores
-         WHERE user_id = ?
-           AND store_id = ?",
+         WHERE user_id = ?",
         [
-            $user['id'],
-            $storeId
+            $user['id']
         ]
     );
 

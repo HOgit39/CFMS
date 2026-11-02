@@ -6,6 +6,7 @@ services:
       - .env:/var/www/html/.env
 
     environment:
+      - TZ=Asia/Tokyo
       - DB_NAME=${DB_NAME?Database name is not set}
       - DB_USER=${DB_USER?User name is not set}
       - DB_PASS=${DB_PASS?Password is not set}
@@ -26,6 +27,7 @@ services:
       - ./frontend:/var/www/html
 
     environment:
+      - TZ=Asia/Tokyo
       - API_URL=${API_URL?API URL is not set}
       - APP_URL=${APP_URL?App URL is not set}
     ports:
@@ -35,6 +37,7 @@ services:
     image: mariadb:12.3
 
     environment:
+      - TZ=Asia/Tokyo
       - MARIADB_DATABASE=${DB_NAME?Database name is not set}
       - MARIADB_USER=${DB_USER?User name is not set}
       - MARIADB_PASSWORD=${DB_PASS?Password is not set}

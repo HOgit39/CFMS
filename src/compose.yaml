@@ -5,6 +5,7 @@ services:
       - ./backend:/var/www/html
 
     environment:
+      - TZ=Asia/Tokyo
       - DB_NAME=${DB_NAME?Database name is not set}
       - DB_USER=${DB_USER?User name is not set}
       - DB_PASS=${DB_PASS?Password is not set}
@@ -25,6 +26,7 @@ services:
       - ./frontend:/var/www/html
 
     environment:
+      - TZ=Asia/Tokyo
       - API_URL=${API_URL?API URL is not set}
       - APP_URL=${APP_URL?App URL is not set}
     ports:
@@ -38,7 +40,7 @@ services:
       - MARIADB_USER=${DB_USER?User name is not set}
       - MARIADB_PASSWORD=${DB_PASS?Password is not set}
       - MARIADB_ROOT_PASSWORD=${DB_ROOT_PASS?Root password is not set}
-      
+      - TZ=Asia/Tokyo
     healthcheck:
       test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
       start_period: 30s
