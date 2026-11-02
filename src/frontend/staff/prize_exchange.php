@@ -504,53 +504,132 @@
             }
 
             if (typeof Html5Qrcode === 'undefined') {
-                showResult('QRコードライブラリを読み込めませんでした。', 'danger');
+                showResult('QRコードライブラリを読み込めませんでした。ページを再読み込みしてください。', 'danger');
                 return;
             }
 
+            if (!window.isSecureContext) {
+                showResult('カメラを使用するにはHTTPS接続が必要です。', 'danger');
+                return;
+            }
+
+            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                showResult('このブラウザーではカメラ機能を利用できません。カメラの権限とブラウザー設定を確認してください。', 'danger');
+                return;
+            }
+
+            startScannerButton.disabled = true;
+            showResult('カメラを起動しています。カメラの使用を許可してください。', 'info');
+
             try {
-                html5QrCode = new Html5Qrcode('reader');
+                html5QrCode = new Html5Qrcode('reader', {
+                    formatsToSupport: [Html5QrcodeSupportedFormats.QR_CODE],
+                    verbose: false
+                });
 
-                const cameras = await Html5Qrcode.getCameras();
-
-                if (!cameras || cameras.length === 0) {
-                    throw new Error('利用できるカメラが見つかりません。');
-                }
-
-                const camera = cameras.find(item =>
-                    /back|rear|environment|背面/i.test(item.label)
-                ) || cameras[0];
-
-                await html5QrCode.start(
-                    camera.id, {
-                        fps: 10,
-                        qrbox: {
-                            width: 250,
-                            height: 250
-                        }
+                // 固定の250pxでは端末によって読み取り枠が映像からはみ出すため、
+                // 実際のプレビューサイズに合わせて読み取り枠を決める。
+                const scannerConfig = {
+                    fps: 20,
+                    qrbox: (viewfinderWidth, viewfinderHeight) => {
+                        const edge = Math.floor(
+                            Math.min(viewfinderWidth, viewfinderHeight) * 0.9
+                        );
+                        const size = Math.max(180, edge);
+                        return {
+                            width: Math.min(size, viewfinderWidth, viewfinderHeight),
+                            height: Math.min(size, viewfinderWidth, viewfinderHeight)
+                        };
                     },
-                    async decodedText => {
-                            // 読み取り成功後、カメラを停止してから検索する。
-                            tokenInput.value = decodedText.trim();
-                            await stopScanner();
-                            await lookupUser(tokenInput.value);
+                    aspectRatio: 1.0,
+                    disableFlip: false
+                };
+
+                const onScanSuccess = async decodedText => {
+                    // 二重検出による検索の多重実行を防止する。
+                    if (!scannerRunning) {
+                        return;
+                    }
+
+                    scannerRunning = false;
+                    tokenInput.value = decodedText.trim();
+
+                    try {
+                        await html5QrCode.stop();
+                        html5QrCode.clear();
+                    } catch (stopError) {
+                        console.warn('QRコードリーダー停止エラー:', stopError);
+                    } finally {
+                        startScannerButton.disabled = false;
+                        stopScannerButton.disabled = true;
+                    }
+
+                    await lookupUser(tokenInput.value);
+                };
+
+                const onScanFailure = errorMessage => {
+                    // QRコード未検出は通常の状態なので、画面には表示しない。
+                    // 必要な場合のみ開発者ツールで確認できるようにする。
+                    if (errorMessage && !String(errorMessage).includes('No MultiFormat Readers')) {
+                        console.debug('QRコード読み取り中:', errorMessage);
+                    }
+                };
+
+                try {
+                    // facingModeを指定して背面カメラを優先する。
+                    await html5QrCode.start({
+                            facingMode: 'environment'
                         },
-                        () => {
-                            // 読み取り途中の失敗は継続する。
-                        }
-                );
+                        scannerConfig,
+                        onScanSuccess,
+                        onScanFailure
+                    );
+                } catch (environmentError) {
+                    // facingMode指定に対応しない環境では、カメラID指定に切り替える。
+                    const cameras = await Html5Qrcode.getCameras();
+
+                    if (!cameras || cameras.length === 0) {
+                        throw environmentError;
+                    }
+
+                    const camera = cameras.find(item =>
+                        /back|rear|environment|背面/i.test(item.label)
+                    ) || cameras[cameras.length - 1];
+
+                    await html5QrCode.start(
+                        camera.id,
+                        scannerConfig,
+                        onScanSuccess,
+                        onScanFailure
+                    );
+                }
 
                 scannerRunning = true;
                 startScannerButton.disabled = true;
                 stopScannerButton.disabled = false;
-                showResult('QRコードをカメラにかざしてください。', 'info');
+                showResult('QRコードを読み取ります。画面中央の枠内にQRコード全体を映してください。', 'info');
             } catch (error) {
                 scannerRunning = false;
                 startScannerButton.disabled = false;
                 stopScannerButton.disabled = true;
 
+                if (html5QrCode) {
+                    try {
+                        if (html5QrCode.isScanning) {
+                            await html5QrCode.stop();
+                        }
+                        html5QrCode.clear();
+                    } catch (cleanupError) {
+                        console.warn('カメラ解放エラー:', cleanupError);
+                    }
+                }
+
+                const message = error && error.message ?
+                    error.message :
+                    'カメラを起動できませんでした。';
+
                 showResult(
-                    error.message || 'カメラを起動できませんでした。',
+                    'カメラを起動できませんでした。カメラの使用許可、他のアプリによるカメラ占有、HTTPS接続を確認してください。(' + message + ')',
                     'danger'
                 );
             }
@@ -560,12 +639,17 @@
          * QRコードリーダーを停止する。
          */
         async function stopScanner() {
-            if (!html5QrCode || !scannerRunning) {
+            if (!html5QrCode) {
+                scannerRunning = false;
+                startScannerButton.disabled = false;
+                stopScannerButton.disabled = true;
                 return;
             }
 
             try {
-                await html5QrCode.stop();
+                if (html5QrCode.isScanning) {
+                    await html5QrCode.stop();
+                }
                 html5QrCode.clear();
             } catch (error) {
                 console.error('QRコードリーダー停止エラー:', error);

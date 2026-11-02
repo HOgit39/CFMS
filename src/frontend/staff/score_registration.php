@@ -959,17 +959,36 @@
                         await html5QrCode.start({
                                 facingMode: 'environment'
                             }, {
-                                fps: 10,
-                                qrbox: {
-                                    width: 250,
-                                    height: 250
-                                }
+                                fps: 20,
+                                qrbox: (viewfinderWidth, viewfinderHeight) => {
+                                    const edge = Math.floor(
+                                        Math.min(viewfinderWidth, viewfinderHeight) * 0.9
+                                    );
+                                    const size = Math.max(180, edge);
+
+                                    return {
+                                        width: Math.min(size, viewfinderWidth, viewfinderHeight),
+                                        height: Math.min(size, viewfinderWidth, viewfinderHeight)
+                                    };
+                                },
+                                aspectRatio: 1.0,
+                                videoConstraints: {
+                                    facingMode: 'environment',
+                                    width: {
+                                        ideal: 1920
+                                    },
+                                    height: {
+                                        ideal: 1080
+                                    },
+                                    advanced: [{
+                                        focusMode: 'continuous'
+                                    }]
+                                },
+                                disableFlip: false
                             },
                             async decodedText => {
 
-                                if (
-                                    processingQr
-                                ) {
+                                if (processingQr) {
                                     return;
                                 }
 
@@ -977,24 +996,19 @@
 
                                 try {
 
-                                    const token =
-                                        decodedText.trim();
+                                    const token = decodedText.trim();
 
-                                    tokenInput.value =
-                                        token;
+                                    tokenInput.value = token;
 
                                     await stopQrCamera();
 
-                                    await getUserInfo(
-                                        token
-                                    );
+                                    await getUserInfo(token);
 
                                 } finally {
 
                                     processingQr = false;
                                 }
-                            }
-                        );
+                            });
 
                         cameraRunning = true;
 
