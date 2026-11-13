@@ -1082,11 +1082,11 @@
                         !Number.isSafeInteger(
                             score
                         ) ||
-                        score <= 0
+                        score < 0
                     ) {
 
                         showMessage(
-                            'ポイントは1以上の整数で入力してください。',
+                            'ポイントは0以上の整数で入力してください。',
                             'warning'
                         );
 

@@ -10,7 +10,8 @@
  *             userToken: "abcdefghij",
  *             lastStoreId: 1,
  *             lastStoreName: "1組店舗",
- *             lastHeartbeatAt: "2026-10-30 12:00:00"
+ *             lastHeartbeatAt: "2026-10-30 12:00:00",
+ *             score: 100
  *         }
  *     ]
  * }
@@ -144,6 +145,14 @@ try {
 
         $lastStore = $stmt->fetch(PDO::FETCH_ASSOC);
 
+        $allScoresStmt = $db->exec(
+            "SELECT SUM(score) as total_score
+             FROM scores
+             WHERE user_id = ?",
+            [$user['id']]
+        );
+        $score = $allScoresStmt->fetch(PDO::FETCH_ASSOC)['total_score'] ?? 0;
+
         $expiredUsers[] = [
             "userToken" => $user['token'],
             "lastStoreId" =>
@@ -155,7 +164,8 @@ try {
                 ? $lastStore['name']
                 : null,
             "lastHeartbeatAt" =>
-            $user['last_heartbeat_at']
+            $user['last_heartbeat_at'],
+            "score" => $score
         ];
     }
 

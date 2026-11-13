@@ -115,7 +115,7 @@ try {
     $stmt = $db->exec(
         "SELECT
             COUNT(*) AS total_users,
-            COALESCE(SUM(is_active = 1), 0) AS active_users,
+            COALESCE(SUM(is_active = 1 AND finished_at IS NULL), 0) AS active_users,
             COALESCE(SUM(finished_at IS NOT NULL), 0) AS finished_users
          FROM users"
     );
