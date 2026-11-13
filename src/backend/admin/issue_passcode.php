@@ -151,10 +151,7 @@ try {
         exit;
     }
 
-    $characters =
-        'abcdefghijklmnopqrstuvwxyz' .
-        'ABCDEFGHIJKLMNOPQRSTUVWXYZ' .
-        '0123456789';
+    $characters = '0123456789';
 
     $passcode = '';
 
