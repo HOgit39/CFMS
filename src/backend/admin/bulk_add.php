@@ -219,7 +219,7 @@ try {
         [
             $token,
             null,
-            1,
+            0,
             $finishedAt,
             null
         ]

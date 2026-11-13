@@ -161,6 +161,7 @@
                                 <th scope="col">最終利用店舗</th>
                                 <th scope="col">最終応答日時</th>
                                 <th scope="col">状態</th>
+                                <th scope="col">得点</th>
                             </tr>
                         </thead>
                         <tbody id="expired-users-table">
@@ -464,7 +465,7 @@
                             'td'
                         );
 
-                    cell.colSpan = 4;
+                    cell.colSpan = 5;
 
                     cell.className =
                         'text-center text-secondary py-4';
@@ -539,11 +540,19 @@
                             badge
                         );
 
+                        const scoreCell =
+                            document.createElement(
+                                'td'
+                            );
+
+                        scoreCell.textContent = user.score ?? 0;
+
                         row.append(
                             tokenCell,
                             storeCell,
                             heartbeatCell,
-                            statusCell
+                            statusCell,
+                            scoreCell
                         );
 
                         expiredUsersTable.appendChild(

@@ -103,7 +103,7 @@ $score = filter_var(
     FILTER_VALIDATE_INT
 );
 
-if ($score === false || $score <= 0) {
+if ($score === false || $score < 0) {
     echo json_encode([
         "success" => false,
         "message" => "ポイント値が不正です。"
