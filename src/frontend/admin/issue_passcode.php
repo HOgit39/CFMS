@@ -65,9 +65,10 @@
             border-radius: 8px;
         }
 
-        #qr-code svg {
+        #qr-code img {
             display: block;
-            width: 100%;
+            margin: 0 auto;
+            max-width: 100%;
             height: auto;
         }
     </style>
@@ -201,7 +202,7 @@
     <?php include_once $_SERVER['DOCUMENT_ROOT'] . '/components/footer.php'; ?>
 
     <script src="/lib/bootstrap-5.3.8-dist/js/bootstrap.bundle.min.js"></script>
-    <script src="/lib/qrcode-generator/qrcode.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
     <script>
         'use strict';
@@ -325,18 +326,16 @@
             const url =
                 `${location.origin}${RELOGIN_PATH}#${params.toString()}`;
 
-            const qr =
-                qrcode(0, 'M');
-
-            qr.addData(url);
-
-            qr.make();
-
-            qrCode.innerHTML =
-                qr.createSvgTag({
-                    scalable: true,
-                    margin: 2
-                });
+            new QRCode(
+                qrCode, {
+                    text: url,
+                    width: 200,
+                    height: 200,
+                    colorDark: '#000000',
+                    colorLight: '#ffffff',
+                    correctLevel: QRCode.CorrectLevel.M
+                }
+            );
 
             qrArea.hidden = false;
 
