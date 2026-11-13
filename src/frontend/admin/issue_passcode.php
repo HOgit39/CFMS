@@ -145,8 +145,6 @@
                             再ログインする端末のカメラでこのQRコードを読み取ってください。
                         </p>
                         <div id="qr-code"></div>
-                        <p id="qr-timer-message"
-                            class="small text-secondary mt-2 mb-0"></p>
                     </div>
                 </div>
             </section>
@@ -219,9 +217,6 @@
         // 再ログイン画面のパス（user_login.php の実際の配置場所に合わせて変更）
         const RELOGIN_PATH = '/user/user_login.php';
 
-        // QRコードを表示しておく秒数（経過後に自動で消す）
-        const QR_DISPLAY_SECONDS = 120;
-
         const issuanceForm =
             document.getElementById(
                 'issuance-form'
@@ -267,13 +262,6 @@
                 'qr-code'
             );
 
-        const qrTimerMessage =
-            document.getElementById(
-                'qr-timer-message'
-            );
-
-        let qrTimerId = null;
-
         const expiredUsersTable =
             document.getElementById(
                 'expired-users-table'
@@ -291,16 +279,7 @@
 
         function clearQrCode() {
 
-            if (qrTimerId !== null) {
-
-                clearInterval(qrTimerId);
-
-                qrTimerId = null;
-            }
-
             qrCode.replaceChildren();
-
-            qrTimerMessage.textContent = '';
 
             qrArea.hidden = true;
         }
@@ -338,31 +317,6 @@
             );
 
             qrArea.hidden = false;
-
-            let remaining =
-                QR_DISPLAY_SECONDS;
-
-            qrTimerMessage.textContent =
-                `このQRコードは${remaining}秒後に非表示になります。`;
-
-            qrTimerId =
-                setInterval(
-                    () => {
-
-                        remaining -= 1;
-
-                        if (remaining <= 0) {
-
-                            clearQrCode();
-
-                            return;
-                        }
-
-                        qrTimerMessage.textContent =
-                            `このQRコードは${remaining}秒後に非表示になります。`;
-                    },
-                    1000
-                );
         }
 
         function showMessage(
