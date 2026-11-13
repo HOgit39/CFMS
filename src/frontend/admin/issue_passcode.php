@@ -55,22 +55,6 @@
         .status-badge {
             white-space: nowrap;
         }
-
-        #qr-code {
-            max-width: 240px;
-            margin: 0 auto;
-            padding: 8px;
-            background-color: #fff;
-            border: 1px solid #dee2e6;
-            border-radius: 8px;
-        }
-
-        #qr-code img {
-            display: block;
-            margin: 0 auto;
-            max-width: 100%;
-            height: auto;
-        }
     </style>
     <input class="csrf_token" type="hidden" value="">
 </head>
@@ -138,16 +122,6 @@
                         class="small text-secondary ms-2"
                         role="status"
                         aria-live="polite"></span>
-
-                    <!-- 再ログイン用QRコード -->
-                    <div id="qr-area" class="mt-4 text-center" hidden>
-                        <p class="small text-secondary mb-2">
-                            再ログインする端末のカメラでこのQRコードを読み取ってください。
-                        </p>
-                        <div id="qr-code"></div>
-                        <p id="qr-timer-message"
-                            class="small text-secondary mt-2 mb-0"></p>
-                    </div>
                 </div>
             </section>
             <!-- !SECTION -->
@@ -202,7 +176,6 @@
     <?php include_once $_SERVER['DOCUMENT_ROOT'] . '/components/footer.php'; ?>
 
     <script src="/lib/bootstrap-5.3.8-dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
     <script>
         'use strict';
@@ -215,12 +188,6 @@
 
         const EXPIRED_USERS_API =
             `${API_BASE_URL}/admin/expired.php`;
-
-        // 再ログイン画面のパス（user_login.php の実際の配置場所に合わせて変更）
-        const RELOGIN_PATH = '/user/user_login.php';
-
-        // QRコードを表示しておく秒数（経過後に自動で消す）
-        const QR_DISPLAY_SECONDS = 120;
 
         const issuanceForm =
             document.getElementById(
@@ -257,23 +224,6 @@
                 'copy-message'
             );
 
-        const qrArea =
-            document.getElementById(
-                'qr-area'
-            );
-
-        const qrCode =
-            document.getElementById(
-                'qr-code'
-            );
-
-        const qrTimerMessage =
-            document.getElementById(
-                'qr-timer-message'
-            );
-
-        let qrTimerId = null;
-
         const expiredUsersTable =
             document.getElementById(
                 'expired-users-table'
@@ -288,82 +238,6 @@
             document.getElementById(
                 'reload-users-button'
             );
-
-        function clearQrCode() {
-
-            if (qrTimerId !== null) {
-
-                clearInterval(qrTimerId);
-
-                qrTimerId = null;
-            }
-
-            qrCode.replaceChildren();
-
-            qrTimerMessage.textContent = '';
-
-            qrArea.hidden = true;
-        }
-
-        /**
-         * トークンとパスコードを含む再ログイン用QRコードを表示する。
-         * 認証情報はURLのフラグメント(#)に入れる。
-         * フラグメントはサーバーに送信されず、アクセスログにも残らない。
-         */
-        function renderQrCode(
-            token,
-            passcode
-        ) {
-
-            clearQrCode();
-
-            const params =
-                new URLSearchParams({
-                    token,
-                    passcode
-                });
-
-            const url =
-                `${location.origin}${RELOGIN_PATH}#${params.toString()}`;
-
-            new QRCode(
-                qrCode, {
-                    text: url,
-                    width: 200,
-                    height: 200,
-                    colorDark: '#000000',
-                    colorLight: '#ffffff',
-                    correctLevel: QRCode.CorrectLevel.M
-                }
-            );
-
-            qrArea.hidden = false;
-
-            let remaining =
-                QR_DISPLAY_SECONDS;
-
-            qrTimerMessage.textContent =
-                `このQRコードは${remaining}秒後に非表示になります。`;
-
-            qrTimerId =
-                setInterval(
-                    () => {
-
-                        remaining -= 1;
-
-                        if (remaining <= 0) {
-
-                            clearQrCode();
-
-                            return;
-                        }
-
-                        qrTimerMessage.textContent =
-                            `このQRコードは${remaining}秒後に非表示になります。`;
-                    },
-                    1000
-                );
-        }
 
         function showMessage(
             element,
@@ -488,8 +362,6 @@
 
                 passcodeArea.hidden = true;
 
-                clearQrCode();
-
                 copyMessage.textContent = '';
 
                 const token =
@@ -522,11 +394,6 @@
 
                     passcodeArea.hidden =
                         false;
-
-                    renderQrCode(
-                        token,
-                        data.passcode
-                    );
 
                     showMessage(
                         issuanceMessage,
